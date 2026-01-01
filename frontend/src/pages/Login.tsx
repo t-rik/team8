@@ -2,7 +2,7 @@ import { Terminal } from 'lucide-react';
 
 export function Login() {
   const handleLogin = () => {
-    window.location.href = 'http://localhost:8787/api/auth/login';
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/login`;
   };
 
   return (

@@ -16,7 +16,7 @@ export function MatchFeed() {
   const { data: candidates, isLoading } = useQuery({
     queryKey: ['feed'],
     queryFn: async () => {
-        const res = await fetch('http://localhost:8787/api/feed', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/feed`, {
             // Include credentials if we want to support personalized matching based on session
             credentials: 'include' 
         });

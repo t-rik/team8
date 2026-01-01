@@ -1,0 +1,3 @@
+FOURTYTWO_CLIENT_ID=your_42_uid
+FOURTYTWO_CLIENT_SECRET=your_42_secret
+FRONTEND_URL=http://localhost:5173

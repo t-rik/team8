@@ -42,7 +42,7 @@ export const useStore = create<UserState>((set) => ({
   ],
   fetchUser: async () => {
     try {
-      const res = await fetch('http://localhost:8787/api/auth/me'); // Direct to worker
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`); // Direct to worker
       if (res.ok) {
         const data = await res.json();
         set({ user: data.user, projects: data.projects, isLoadingUser: false });

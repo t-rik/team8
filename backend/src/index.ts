@@ -6,12 +6,15 @@ type Bindings = {
   DB: D1Database
   FOURTYTWO_CLIENT_ID: string
   FOURTYTWO_CLIENT_SECRET: string
+  FRONTEND_URL: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('*', cors({
-  origin: 'http://localhost:5173', // Frontend URL
+  origin: (origin) => {
+    return origin.endsWith('.pages.dev') || origin.includes('localhost') ? origin : 'http://localhost:5173';
+  },
   credentials: true,
 }))
 
@@ -107,7 +110,11 @@ app.get('/api/auth/callback', async (c) => {
     path: '/',
   });
 
-  return c.redirect('http://localhost:5173/');
+  // Redirect to Frontend
+  // In dev: http://localhost:5173
+  // In prod: Your Cloudflare Pages URL
+  const frontendUrl = c.env.FRONTEND_URL || 'http://localhost:5173';
+  return c.redirect(`${frontendUrl}/`);
 })
 
 app.get('/api/auth/me', async (c) => {
