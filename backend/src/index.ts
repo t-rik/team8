@@ -64,6 +64,40 @@ app.get('/api/auth/callback', async (c) => {
       login = excluded.login
   `).bind(id, login, rank, blackholed_at, image_url?.link).run();
 
+  // 3.5 Sync Projects
+  // Filter for 42cursus projects (cursus_id 21) that are active or finished
+  const updateProjects = me.projects_users
+    .filter((pu: any) => 
+      pu.cursus_ids.includes(21) && 
+      ['in_progress', 'searching_a_group', 'finished'].includes(pu.status)
+    );
+
+  // We'll run these in a transaction or just sequential for now
+  // Note: D1 batching is efficient
+  const stmts = [];
+  
+  // First, potentially mark old "in_progress" as others if they changed? 
+  // For MVP, we just upsert. If status changed from in_progress to finished, it updates.
+  for (const p of updateProjects) {
+    stmts.push(c.env.DB.prepare(`
+      INSERT INTO active_projects (user_id, project_id, project_name, status, looking_for_match)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(user_id, project_id) DO UPDATE SET
+        status = excluded.status,
+        project_name = excluded.project_name
+    `).bind(
+      id, 
+      p.project.id, 
+      p.project.name, 
+      p.status, 
+      p.status === 'in_progress' ? 1 : 0 // Default to looking if in progress
+    ));
+  }
+
+  if (stmts.length > 0) {
+    await c.env.DB.batch(stmts);
+  }
+
   // 4. Set Session Cookie (Simple ID for MVP)
   // In production, sign this with a JWT secret!
   setCookie(c, 'team8_session', id.toString(), {
@@ -81,7 +115,9 @@ app.get('/api/auth/me', async (c) => {
   if (!userId) return c.json({ user: null }, 401);
 
   const user = await c.env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(userId).first();
-  return c.json({ user });
+  const { results: projects } = await c.env.DB.prepare('SELECT * FROM active_projects WHERE user_id = ?').bind(userId).all();
+  
+  return c.json({ user, projects });
 })
 
 app.get('/api/feed', async (c) => {

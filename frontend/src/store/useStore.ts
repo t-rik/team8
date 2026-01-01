@@ -45,13 +45,13 @@ export const useStore = create<UserState>((set) => ({
       const res = await fetch('http://localhost:8787/api/auth/me'); // Direct to worker
       if (res.ok) {
         const data = await res.json();
-        set({ user: data.user, isLoadingUser: false });
+        set({ user: data.user, projects: data.projects, isLoadingUser: false });
       } else {
-        set({ user: null, isLoadingUser: false });
+        set({ user: null, projects: [], isLoadingUser: false });
       }
     } catch (error) {
        console.error("Failed to fetch user", error);
-       set({ user: null, isLoadingUser: false });
+       set({ user: null, projects: [], isLoadingUser: false });
     }
   },
   toggleLookingForMatch: (projectId) => set((state) => ({
