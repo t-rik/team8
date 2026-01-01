@@ -1,6 +1,6 @@
 import React from 'react';
-import { Terminal, Users, Search } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { Terminal, Users, Search, LogOut } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,6 +10,12 @@ interface LayoutProps {
 
 export function Layout({ children, activeTab, onTabChange }: LayoutProps) {
   const { user } = useStore();
+
+  const handleLogout = () => {
+    // In a real app, you'd call an API to clear the cookie, then reload/redirect
+    document.cookie = 'team8_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    window.location.reload();
+  };
 
   return (
     <div className="min-h-screen bg-background text-gray-300 flex">
@@ -42,11 +48,19 @@ export function Layout({ children, activeTab, onTabChange }: LayoutProps) {
           </button>
         </div>
 
-        <div className="mt-auto pt-6 border-t border-surface">
+        <div className="mt-auto pt-6 border-t border-surface space-y-4">
           <div className="text-xs text-gray-500 font-mono">
             Logged in as <br />
             <span className="text-white text-sm">{user?.login}</span>
           </div>
+          
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-xs text-danger hover:text-red-400 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Disconnect</span>
+          </button>
         </div>
       </nav>
 

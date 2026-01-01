@@ -12,16 +12,17 @@ interface Candidate {
 }
 
 export function MatchFeed() {
-  // Mock fetch for now, replace with actual fetch to backend when running
+  // Fetch matches from the backend
   const { data: candidates, isLoading } = useQuery({
     queryKey: ['feed'],
     queryFn: async () => {
-        // In a real scenario, this would be: await fetch('http://localhost:8787/api/feed').then(res => res.json())
-        // For development without the backend running simultaneously in the same terminal, we'll mock:
-        return [
-            { id: 2, login: 'match_maker', level: 5.6, image_url: 'https://ui-avatars.com/api/?name=Match+Maker', matched_projects: 'Minishell', score: 140 },
-            { id: 3, login: 'expert_deviant', level: 12.0, image_url: 'https://ui-avatars.com/api/?name=Expert', matched_projects: 'Minishell', score: 110 },
-        ] as Candidate[];
+        const res = await fetch('http://localhost:8787/api/feed', {
+            // Include credentials if we want to support personalized matching based on session
+            credentials: 'include' 
+        });
+        if (!res.ok) throw new Error('Failed to fetch feed');
+        const data = await res.json();
+        return data.candidates as Candidate[];
     }
   });
 
