@@ -15,17 +15,15 @@ interface UserState {
     level: number;
     image_url: string;
   } | null;
+  isLoadingUser: boolean;
   projects: Project[];
+  fetchUser: () => Promise<void>;
   toggleLookingForMatch: (projectId: number) => void;
 }
 
 export const useStore = create<UserState>((set) => ({
-  user: {
-    id: 1,
-    login: "current_user",
-    level: 5.45,
-    image_url: "https://ui-avatars.com/api/?name=Current+User&background=0D8ABC&color=fff"
-  },
+  user: null,
+  isLoadingUser: true,
   projects: [
     {
       project_id: 42,
@@ -42,6 +40,20 @@ export const useStore = create<UserState>((set) => ({
       has_team: true,
     }
   ],
+  fetchUser: async () => {
+    try {
+      const res = await fetch('http://localhost:8787/api/auth/me'); // Direct to worker
+      if (res.ok) {
+        const data = await res.json();
+        set({ user: data.user, isLoadingUser: false });
+      } else {
+        set({ user: null, isLoadingUser: false });
+      }
+    } catch (error) {
+       console.error("Failed to fetch user", error);
+       set({ user: null, isLoadingUser: false });
+    }
+  },
   toggleLookingForMatch: (projectId) => set((state) => ({
     projects: state.projects.map(p => 
       p.project_id === projectId 

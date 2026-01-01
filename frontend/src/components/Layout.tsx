@@ -1,5 +1,6 @@
 import React from 'react';
 import { Terminal, Users, Search } from 'lucide-react';
+import { useStore } from '../store/useStore';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -8,6 +9,8 @@ interface LayoutProps {
 }
 
 export function Layout({ children, activeTab, onTabChange }: LayoutProps) {
+  const { user } = useStore();
+
   return (
     <div className="min-h-screen bg-background text-gray-300 flex">
       {/* Sidebar */}
@@ -42,7 +45,7 @@ export function Layout({ children, activeTab, onTabChange }: LayoutProps) {
         <div className="mt-auto pt-6 border-t border-surface">
           <div className="text-xs text-gray-500 font-mono">
             Logged in as <br />
-            <span className="text-white text-sm">current_user</span>
+            <span className="text-white text-sm">{user?.login}</span>
           </div>
         </div>
       </nav>
