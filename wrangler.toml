@@ -5,5 +5,5 @@ compatibility_date = "2024-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "team8-db"
-database_id = "to-be-replaced-with-real-id"
+database_id = "fb927cfc-60d7-463b-8e92-ddd5aba4278b"
 preview_database_id = "DB"
